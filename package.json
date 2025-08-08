@@ -1,0 +1,28 @@
+{
+  "name": "screeps-swift-starter",
+  "version": "1.0.0",
+  "description": "A starter kit for developing Screeps AI using Swift and WebAssembly",
+  "main": "dist/main.js",
+  "scripts": {
+    "build:unix": "./build.sh",
+    "deploy": "screeps-deploy",
+    "watch": "nodemon --watch Sources --ext swift --exec \"npm run build\"",
+    "clean": "if exist .build rmdir /s /q .build && if exist .build-wasm rmdir /s /q .build-wasm && if exist dist rmdir /s /q dist",
+    "clean:unix": "rm -rf .build .build-wasm dist"
+  },
+  "keywords": [
+    "screeps",
+    "swift",
+    "webassembly",
+    "wasm",
+    "ai",
+    "bot"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "screeps-deploy": "^1.0.0",
+    "nodemon": "^3.0.0"
+  },
+  "dependencies": {}
+}
