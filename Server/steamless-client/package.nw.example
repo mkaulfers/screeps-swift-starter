@@ -1,0 +1,5 @@
+This is a placeholder file only.
+
+To run the optional `steamless-client` container, replace this with the real Screeps `package.nw`
+from your Steam installation, or set `SCREEPS_NW_DIR` to a directory that already contains
+the real `package.nw`.
