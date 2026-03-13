@@ -38,6 +38,24 @@ cp screeps.sample.json screeps.json
 
 Then edit `screeps.json` with your credentials and target branch.
 
+If you want to run a local private server, use the Docker setup in `Server/`.
+It uses the `screepers/screeps-launcher` image with MongoDB and Redis.
+
+Quick start:
+
+```bash
+cp Server/screeps/config.example.yml Server/screeps/config.yml
+docker compose -f Server/docker-compose.yml up -d
+```
+
+Then deploy to your local server with:
+
+```bash
+npm run push-pserver
+```
+
+See `Server/README.md` for the full setup and CLI workflow.
+
 ## Write Your Bot
 
 Edit `Sources/ScreepsSwift/main.swift`.

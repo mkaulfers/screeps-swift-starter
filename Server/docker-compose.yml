@@ -1,0 +1,21 @@
+services:
+  mongo:
+    image: mongo:4
+    restart: unless-stopped
+    volumes:
+      - ./mongo:/data/db
+
+  redis:
+    image: redis:6
+    restart: unless-stopped
+
+  screeps:
+    image: screepers/screeps-launcher
+    restart: unless-stopped
+    depends_on:
+      - mongo
+      - redis
+    ports:
+      - "21025:21025"
+    volumes:
+      - ./screeps:/screeps

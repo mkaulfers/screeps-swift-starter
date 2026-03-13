@@ -1,0 +1,12 @@
+steamKey: YOUR_STEAM_KEY
+
+mods:
+  - screepsmod-auth
+  - screepsmod-admin-utils
+  - screepsmod-mongo
+  - screepsmod-map-tool
+
+bots: {}
+
+serverConfig:
+  tickRate: 1000
