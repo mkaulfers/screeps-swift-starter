@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:screeps-swift-starter}",
+            "name": "Debug ScreepsSwift",
+            "target": "ScreepsSwift",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug ScreepsSwift"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:screeps-swift-starter}",
+            "name": "Release ScreepsSwift",
+            "target": "ScreepsSwift",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release ScreepsSwift"
+        }
+    ]
+}

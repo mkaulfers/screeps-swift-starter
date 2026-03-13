@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: macos-14
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Resolve Swift dependencies
+        run: swift package resolve
+
+      - name: Check generated bindings and project layout
+        run: npm run lint
+
+      - name: Run JavaScript smoke tests
+        run: npm test
+
+      - name: Run Swift tests
+        run: swift test
+
+      - name: Build bootstrap assets
+        run: node Scripts/build.mjs --skip-swift

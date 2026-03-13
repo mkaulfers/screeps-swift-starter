@@ -1,28 +1,52 @@
-import JavaScriptKit
+import ScreepsKit
 
-func gameLoop() {
+private func runStarterBot() {
     let game = Game.shared
-    
-    for (name, creep) in game.creeps {
-        if creep.energy == 0 {
-            let sources = ScreepsJS.global.Game.object!.spawns.object!
-            let spawnKeys = JSObject.global.Object.function!.keys(sources).object!
-            
-            if let firstSpawnKey = spawnKeys[0].string,
-               let spawn = sources[firstSpawnKey].object {
-                creep.moveTo(spawn)
-            }
-        } else {
-            let controller = ScreepsJS.global.Game.object!.rooms.object![creep.pos?.roomName ?? ""].object!.controller.object!
-            if creep.upgradeController(controller) == -9 {
-                creep.moveTo(controller)
-            }
+    let creeps = game.creeps.values.sorted { $0.name < $1.name }
+
+    for creep in creeps {
+        guard let room = creep.room else {
+            continue
         }
-        
-        creep.say("Swift Bot \(game.time)")
+
+        if creep.store[.energy] == 0 {
+            if let source = room.activeSources.first ?? room.sources.first {
+                let result = creep.harvest(source)
+                if result == .notInRange {
+                    _ = creep.moveTo(source)
+                }
+            }
+
+            creep.say("Harvest")
+            continue
+        }
+
+        if let spawn = room.mySpawns.first(where: { $0.store.freeCapacity(for: .energy) > 0 }) {
+            let result = creep.transfer(spawn, resource: .energy)
+            if result == .notInRange {
+                _ = creep.moveTo(spawn)
+            }
+            creep.say("Refill")
+            continue
+        }
+
+        if let extensionStructure = room.myExtensions.first(where: { $0.store.freeCapacity(for: .energy) > 0 }) {
+            let result = creep.transfer(extensionStructure, resource: .energy)
+            if result == .notInRange {
+                _ = creep.moveTo(extensionStructure)
+            }
+            creep.say("Charge")
+            continue
+        }
+
+        if let controller = room.controller {
+            let result = creep.upgradeController(controller)
+            if result == .notInRange {
+                _ = creep.moveTo(controller)
+            }
+            creep.say("Swift \(game.time)")
+        }
     }
 }
 
-ScreepsJS.exportLoop(gameLoop)
-
-print("Swift WASM Screeps bot initialized!")
+ScreepsRuntime.install(loop: runStarterBot)

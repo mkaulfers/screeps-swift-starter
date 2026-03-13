@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "npm: build",
+      "type": "shell",
+      "command": "npm run build",
+      "problemMatcher": []
+    },
+    {
+      "label": "npm: lint",
+      "type": "shell",
+      "command": "npm run lint",
+      "problemMatcher": []
+    },
+    {
+      "label": "npm: test",
+      "type": "shell",
+      "command": "npm test && swift test",
+      "problemMatcher": []
+    },
+    {
+      "label": "npm: push-main",
+      "type": "shell",
+      "command": "npm run push-main",
+      "problemMatcher": []
+    }
+  ]
+}

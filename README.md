@@ -1,137 +1,184 @@
 # Screeps Swift Starter
 
-A starter kit for developing [Screeps](https://screeps.com/) AI using Swift and WebAssembly.
+A Swift/WebAssembly starter for building [Screeps](https://screeps.com/) bots with a workflow modeled after the TypeScript starter, but aimed at Swift developers.
 
-## Overview
+## What This Starter Provides
 
-This project provides a foundation for writing Screeps AI bots using Swift compiled to WebAssembly. It includes:
+- A `ScreepsKit` Swift library target for user bot code and typed game wrappers
+- A `ScreepsSwift` executable target that becomes the WebAssembly module uploaded to Screeps
+- A CommonJS `main.js` bootstrap that loads the uploaded `.wasm` binary module inside Screeps
+- Generated Swift enums and metadata sourced from `@types/screeps`
+- Type-safe wrappers for core game objects such as `Game`, `Room`, `Creep`, `Source`, `StructureSpawn`, `StructureExtension`, `StructureController`, `Store`, and `RoomPosition`
+- Multi-environment deploy scripts similar to the TypeScript starter: `push-main`, `push-pserver`, `push-sim`, `watch-*`
+- Swift tests, JS smoke tests, and CI checks
 
-- Swift type definitions for core Screeps game objects
-- JavaScript interop layer using JavaScriptKit
-- Build tools for compiling Swift to WASM
-- Example implementation with basic creep behavior
+## Architecture
 
-## Prerequisites
+This project does not try to run a local-file Node loader inside Screeps. Instead it uses the runtime model Screeps actually supports:
 
-1. **SwiftWasm Toolchain**: Download and install from [SwiftWasm releases](https://github.com/swiftwasm/swift/releases)
-2. **Node.js**: For deployment and build tools
-3. **Screeps Account**: To deploy and test your bot
+1. Swift compiles to `ScreepsSwift.wasm`
+2. `dist/main.js` loads that binary module using `require("ScreepsSwift")`
+3. `dist/javascript-kit-swift.js` provides the JavaScriptKit runtime glue
+4. Swift registers the tick handler on `globalThis.__swiftScreepsLoop`
+5. `main.js` exports `module.exports.loop` and calls into the registered Swift loop every tick
 
-## Project Structure
+## Requirements
 
+- Node.js 20+
+- Swift 6+
+- A SwiftWasm SDK installed via `swift sdk install`
+- A Screeps auth token for official servers, or username/password for private servers
+
+## Install
+
+```bash
+npm install
+swift package resolve
 ```
-screeps-swift-starter/
-├── Package.swift                    # Swift package configuration
-├── Sources/ScreepsSwift/
-│   ├── main.swift                  # Main entry point and game loop
-│   ├── Types/
-│   │   ├── Game.swift             # Game object type definitions
-│   │   └── Creep.swift            # Creep object with basic methods
-│   └── Interop/
-│       └── JSInterop.swift        # JavaScript interoperability layer
-├── build.sh                        # Build script for Unix/Linux/macOS
-├── build.bat                       # Build script for Windows
-├── package.json                    # NPM configuration
-└── README.md                       # This file
+
+Install a SwiftWasm SDK before building. One example:
+
+```bash
+swift sdk install https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.0.2-RELEASE/swift-wasm-6.0.2-RELEASE-wasm32-unknown-wasip1.artifactbundle.tar.gz
 ```
 
-## Getting Started
+If your SDK name differs, set `SWIFT_WASM_SDK` before building:
 
-1. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
+```bash
+export SWIFT_WASM_SDK=wasm32-unknown-wasip1
+```
 
-2. **Build the Project**:
-   
-   **Windows**:
-   ```cmd
-   npm run build
-   ```
-   
-   **Unix/Linux/macOS**:
-   ```bash
-   npm run build:unix
-   ```
+## Project Layout
 
-3. **Deploy to Screeps**:
-   - Configure `screeps-deploy` with your credentials
-   - Run: `npm run deploy`
+```text
+Package.swift
+Sources/
+  ScreepsKit/
+    API/
+    Generated/
+    Interop/
+    Runtime/
+  ScreepsSwift/
+    main.swift
+Scripts/
+  bootstrap/
+  lib/
+  build.mjs
+  generate-bindings.mjs
+  upload.mjs
+test/
+Tests/
+```
 
-## Example Bot Behavior
+## Build And Test
 
-The starter bot implements basic creep behavior:
+Generate bindings from `@types/screeps`:
 
-- **Energy Collection**: Creeps move to spawns when they have no energy
-- **Controller Upgrade**: Creeps upgrade the room controller when they have energy
-- **Status Display**: Creeps say "Swift Bot [tick]" to show they're working
+```bash
+npm run generate-bindings
+```
 
-## Available Types
+Build the full Screeps distribution:
 
-### Game
-- `Game.shared.time`: Current game tick
-- `Game.shared.creeps`: Dictionary of all your creeps
-- `Game.shared.spawns`: Dictionary of all your spawns
+```bash
+npm run build
+```
 
-### Creep
-- `creep.pos`: Current position (x, y, roomName)
-- `creep.energy`: Current energy amount
-- `creep.energyCapacity`: Maximum energy capacity
-- `creep.moveTo(target)`: Move towards target
-- `creep.harvest(source)`: Harvest from energy source
-- `creep.transfer(target, resource)`: Transfer resources
-- `creep.upgradeController(controller)`: Upgrade room controller
-- `creep.say(message)`: Display message above creep
+Build only the JS/bootstrap assets without compiling Swift:
 
-## Adding New Types
+```bash
+node Scripts/build.mjs --skip-swift
+```
 
-To add new Screeps object types:
+Run checks:
 
-1. Create a new Swift file in `Sources/ScreepsSwift/Types/`
-2. Use JavaScriptKit to wrap the JavaScript object
-3. Import the type in `main.swift`
-4. Add methods that call the underlying JavaScript API
+```bash
+swift test
+npm test
+npm run lint
+```
 
-Example:
+## Deployment
+
+Copy `screeps.sample.json` to `screeps.json` and fill in the target credentials.
+
+Official server:
+
+```bash
+npm run push-main
+```
+
+Simulation:
+
+```bash
+npm run push-sim
+```
+
+Private server:
+
+```bash
+npm run push-pserver
+```
+
+Watch and deploy on change:
+
+```bash
+npm run watch-main
+```
+
+The uploader reads every `.js` and `.wasm` file from `dist/`, converts `.wasm` files to Screeps binary modules, and uploads them through the Screeps code API.
+
+## Generated Bindings
+
+`Scripts/generate-bindings.mjs` parses `node_modules/@types/screeps/index.d.ts` and regenerates:
+
+- `ReturnCode`
+- `FindConstant`
+- `Direction`
+- `ColorConstant`
+- `BodyPart`
+- `LookConstant`
+- `StructureType`
+- `ResourceType`
+- generated interface/global metadata
+
+The generated file lives at `Sources/ScreepsKit/Generated/ScreepsBindings.generated.swift`.
+
+## Swift API Surface
+
+The user-facing API intentionally hides raw `JSObject` values from public method signatures. A few examples:
+
 ```swift
-public struct Source {
-    private let jsObject: JSObject
-    
-    init(jsObject: JSObject) {
-        self.jsObject = jsObject
-    }
-    
-    public var energy: Int {
-        return Int(jsObject.energy.number ?? 0)
+let game = Game.shared
+let creep = game.creeps["Worker1"]
+let sources = creep?.room?.sources ?? []
+let controller = creep?.room?.controller
+```
+
+```swift
+if creep.store[.energy] == 0, let source = creep.room?.sources.first {
+    let result = creep.harvest(source)
+    if result == .notInRange {
+        _ = creep.moveTo(source)
     }
 }
 ```
 
-## Development
+## Editor Tasks
 
-- **Watch Mode**: `npm run watch` - Automatically rebuilds on Swift file changes
-- **Clean Build**: 
-  - Windows: `npm run clean` 
-  - Unix: `npm run clean:unix`
-- **Manual Build**: 
-  - Windows: `build.bat` 
-  - Unix: `./build.sh`
+VS Code/Cursor tasks are provided in `.vscode/tasks.json` for:
 
-## Technical Notes
+- `npm: build`
+- `npm: lint`
+- `npm: test`
+- `npm: push-main`
 
-- Uses JavaScriptKit for Swift-JavaScript interop
-- Compiles to WebAssembly using SwiftWasm toolchain
-- Exports main loop function to Screeps runtime
-- Supports all standard Screeps API features through JavaScript bridge
+## Notes
 
-## Contributing
-
-This is a starter template. Feel free to:
-- Add more Screeps object type definitions
-- Improve the JavaScript interop layer  
-- Add utility functions and AI logic
-- Submit issues and pull requests
+- Native `swift test` validates the library target and generated types on the host machine.
+- Full `npm run build` requires a SwiftWasm SDK and will fail with a helpful error until one is installed.
+- The current typed wrapper layer focuses on the most important gameplay objects while the generated definitions keep the project aligned with Screeps' declaration source.
 
 ## License
 
-MIT License - See LICENSE file for details
+MIT. See `LICENSE`.
