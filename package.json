@@ -6,21 +6,20 @@
   "main": "dist/main.js",
   "scripts": {
     "clean": "node Scripts/clean.mjs",
-    "generate-bindings": "node Scripts/generate-bindings.mjs",
-    "build": "npm run generate-bindings && node Scripts/build.mjs",
-    "build:swift": "node Scripts/build.mjs --skip-bindings",
+    "build": "node Scripts/build.mjs",
+    "build:swift": "node Scripts/build.mjs",
     "build:bootstrap": "node Scripts/build.mjs --skip-swift",
-    "lint": "node Scripts/generate-bindings.mjs --check && node Scripts/check-project.mjs",
+    "lint": "node Scripts/check-project.mjs",
     "test": "node --test test/**/*.test.mjs",
     "push-main": "npm run build && node Scripts/upload.mjs --dest main",
     "push-pserver": "npm run build && node Scripts/upload.mjs --dest pserver",
     "push-season": "npm run build && node Scripts/upload.mjs --dest season",
     "push-sim": "npm run build && node Scripts/upload.mjs --dest sim",
-    "watch": "chokidar \"Sources/**/*.swift\" \"Scripts/**/*.mjs\" \"Package.swift\" \"node_modules/@types/screeps/index.d.ts\" -c \"npm run build\"",
-    "watch-main": "chokidar \"Sources/**/*.swift\" \"Scripts/**/*.mjs\" \"Package.swift\" \"node_modules/@types/screeps/index.d.ts\" -c \"npm run push-main\"",
-    "watch-pserver": "chokidar \"Sources/**/*.swift\" \"Scripts/**/*.mjs\" \"Package.swift\" \"node_modules/@types/screeps/index.d.ts\" -c \"npm run push-pserver\"",
-    "watch-season": "chokidar \"Sources/**/*.swift\" \"Scripts/**/*.mjs\" \"Package.swift\" \"node_modules/@types/screeps/index.d.ts\" -c \"npm run push-season\"",
-    "watch-sim": "chokidar \"Sources/**/*.swift\" \"Scripts/**/*.mjs\" \"Package.swift\" \"node_modules/@types/screeps/index.d.ts\" -c \"npm run push-sim\""
+    "watch": "chokidar \"Sources/**/*.swift\" \"Scripts/**/*.mjs\" \"Package.swift\" -c \"npm run build\"",
+    "watch-main": "chokidar \"Sources/**/*.swift\" \"Scripts/**/*.mjs\" \"Package.swift\" -c \"npm run push-main\"",
+    "watch-pserver": "chokidar \"Sources/**/*.swift\" \"Scripts/**/*.mjs\" \"Package.swift\" -c \"npm run push-pserver\"",
+    "watch-season": "chokidar \"Sources/**/*.swift\" \"Scripts/**/*.mjs\" \"Package.swift\" -c \"npm run push-season\"",
+    "watch-sim": "chokidar \"Sources/**/*.swift\" \"Scripts/**/*.mjs\" \"Package.swift\" -c \"npm run push-sim\""
   },
   "keywords": [
     "screeps",
@@ -33,10 +32,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^25.5.0",
-    "@types/screeps": "^3.3.8",
-    "chokidar-cli": "^3.0.0",
-    "typescript": "^5.9.3"
+    "chokidar-cli": "^3.0.0"
   },
   "dependencies": {
     "javascript-kit-swift": "^0.20.0",

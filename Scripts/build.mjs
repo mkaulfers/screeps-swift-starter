@@ -1,13 +1,13 @@
 import { cp, mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
+import { resolveScreepsKitBootstrap } from "./lib/resolve-screepskit-bootstrap.mjs";
 
 const root = process.cwd();
 const distDir = path.join(root, "dist");
 const buildDir = path.join(root, ".build-wasm");
 const args = new Set(process.argv.slice(2));
 
-const bootstrapSource = path.join(root, "Scripts", "bootstrap", "main.js");
 const runtimeSource = path.join(
   root,
   "node_modules",
@@ -125,6 +125,18 @@ async function buildSwift() {
 }
 
 async function buildJavaScriptModules() {
+  let bootstrapSource = await resolveScreepsKitBootstrap(root);
+  if (!bootstrapSource) {
+    run("swift", ["package", "resolve"], "Swift package resolve");
+    bootstrapSource = await resolveScreepsKitBootstrap(root);
+  }
+
+  if (!bootstrapSource) {
+    throw new Error(
+      "Unable to locate ScreepsKit bootstrap asset. Resolve package dependencies or ensure ../ScreepsKit exists."
+    );
+  }
+
   const bootstrap = await readFile(bootstrapSource, "utf8");
   await writeFile(path.join(distDir, "main.js"), bootstrap);
   await cp(runtimeSource, path.join(distDir, "javascript-kit-swift.js"));

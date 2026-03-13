@@ -22,13 +22,13 @@ jobs:
       - name: Resolve Swift dependencies
         run: swift package resolve
 
-      - name: Check generated bindings and project layout
+      - name: Check starter layout
         run: npm run lint
 
       - name: Run JavaScript smoke tests
         run: npm test
 
-      - name: Run Swift tests
+      - name: Build starter package
         run: swift test
 
       - name: Build bootstrap assets

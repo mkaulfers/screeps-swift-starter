@@ -7,10 +7,6 @@ let package = Package(
         .macOS(.v13),
     ],
     products: [
-        .library(
-            name: "ScreepsKit",
-            targets: ["ScreepsKit"]
-        ),
         .executable(
             name: "ScreepsSwift",
             targets: ["ScreepsSwift"]
@@ -18,27 +14,22 @@ let package = Package(
     ],
     dependencies: [
         .package(
-            url: "https://github.com/swiftwasm/JavaScriptKit.git",
-            from: "0.20.0"
+            url: "https://github.com/mkaulfers/ScreepsKit.git",
+            from: "0.1.0"
         ),
     ],
     targets: [
-        .target(
-            name: "ScreepsKit",
-            dependencies: [
-                .product(name: "JavaScriptKit", package: "JavaScriptKit"),
-                .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
-            ]
-        ),
         .executableTarget(
             name: "ScreepsSwift",
             dependencies: [
-                "ScreepsKit",
+                .product(name: "ScreepsKit", package: "ScreepsKit"),
             ]
         ),
         .testTarget(
-            name: "ScreepsKitTests",
-            dependencies: ["ScreepsKit"]
+            name: "ScreepsSwiftStarterTests",
+            dependencies: [
+                .product(name: "ScreepsKit", package: "ScreepsKit"),
+            ]
         ),
     ]
 )

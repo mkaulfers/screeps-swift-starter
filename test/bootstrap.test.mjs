@@ -3,9 +3,12 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import vm from "node:vm";
+import { resolveScreepsKitBootstrap } from "../Scripts/lib/resolve-screepskit-bootstrap.mjs";
 
 test("bootstrap registers and reuses the exported Swift loop", async () => {
-  const source = await readFile(path.join(process.cwd(), "Scripts", "bootstrap", "main.js"), "utf8");
+  const bootstrapPath = await resolveScreepsKitBootstrap(process.cwd());
+  assert.ok(bootstrapPath);
+  const source = await readFile(bootstrapPath, "utf8");
 
   let runtimeMainCalls = 0;
   let exportedLoopCalls = 0;
@@ -56,7 +59,7 @@ test("bootstrap registers and reuses the exported Swift loop", async () => {
 
   const context = vm.createContext(sandbox);
 
-  new vm.Script(source, { filename: "bootstrap/main.js" }).runInContext(context);
+  new vm.Script(source, { filename: path.relative(process.cwd(), bootstrapPath) }).runInContext(context);
 
   assert.equal(typeof module.exports.loop, "function");
   module.exports.loop();
