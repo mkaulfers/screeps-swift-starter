@@ -1,0 +1,21 @@
+{
+  "files.exclude": {
+    ".github": true,
+    ".build": true,
+    ".build-wasm": true,
+    ".swiftpm": true,
+    "dist": true,
+    "Scripts": true,
+    "Tests": true,
+    "Package.resolved": true,
+    "package-lock.json": true,
+    "build.sh": true
+  },
+  "search.exclude": {
+    ".build": true,
+    ".build-wasm": true,
+    ".swiftpm": true,
+    "dist": true,
+    "node_modules": true
+  }
+}
