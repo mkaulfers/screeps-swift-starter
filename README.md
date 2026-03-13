@@ -12,7 +12,7 @@ Write a Screeps bot in Swift, compile it to WebAssembly, and deploy it to Screep
 Install a SwiftWasm SDK. Example:
 
 ```bash
-swift sdk install https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.0.2-RELEASE/swift-wasm-6.0.2-RELEASE-wasm32-unknown-wasip1.artifactbundle.tar.gz
+ swift sdk install https://download.swift.org/swift-6.2.4-release/wasm-sdk/swift-6.2.4-RELEASE/swift-6.2.4-RELEASE_wasm.artifactbundle.tar.gz --checksum 32fdb8772d73bb174f77b5c59bc88a0d55003d75712832129394d3465158fb43
 ```
 
 If your SDK installs under a different name, set:

@@ -58,7 +58,7 @@ function sdkArguments() {
       [
         "No Swift WASM SDK is installed.",
         "Install one first, for example:",
-        "  swift sdk install https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.0.2-RELEASE/swift-wasm-6.0.2-RELEASE-wasm32-unknown-wasip1.artifactbundle.tar.gz",
+        "  swift sdk install https://github.com/swiftwasm/swift/releases/download/swift-wasm-6.2-RELEASE/swift-wasm-6.2-RELEASE-wasm32-unknown-wasip1.artifactbundle.tar.gz",
         "Then re-run `npm run build`.",
       ].join("\n")
     );
