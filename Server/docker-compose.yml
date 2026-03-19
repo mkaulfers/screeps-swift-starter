@@ -1,17 +1,18 @@
 services:
   mongo:
-    image: mongo:4
+    image: mongo:4.4.30
     restart: unless-stopped
     volumes:
-      - ./mongo:/data/db
+      - mongo-data:/data/db
 
   redis:
-    image: redis:6
+    image: redis:7
     restart: unless-stopped
+    volumes:
+      - redis-data:/data
 
   screeps:
-    image: screepers/screeps-launcher
-    platform: linux/amd64
+    image: ghcr.io/jomik/screeps-server:edge
     restart: unless-stopped
     depends_on:
       - mongo
@@ -19,7 +20,14 @@ services:
     ports:
       - "21025:21025"
     volumes:
-      - ./screeps:/screeps
+      - ./screeps/config.yml:/screeps/config.yml
+      - screeps-user:/home/node
+      - screeps-data:/data
+      - screeps-mods:/screeps/mods
+    environment:
+      MONGO_HOST: mongo
+      REDIS_HOST: redis
+      STEAM_KEY: ${STEAM_KEY:?"Missing STEAM_KEY. Create Server/.env from Server/.env.example or export STEAM_KEY before starting Docker Compose."}
 
   steamless-client:
     image: node:22
@@ -44,4 +52,9 @@ services:
       - steamless-npm-cache:/root/.npm
 
 volumes:
+  mongo-data:
+  redis-data:
+  screeps-data:
+  screeps-mods:
+  screeps-user:
   steamless-npm-cache:

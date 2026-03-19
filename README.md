@@ -39,14 +39,17 @@ cp screeps.sample.json screeps.json
 Then edit `screeps.json` with your credentials and target branch.
 
 If you want to run a local private server, use the Docker setup in `Server/`.
-It uses the `screepers/screeps-launcher` image with MongoDB and Redis, and can optionally start `steamless-client` for the browser client experience.
+It uses [`Jomik/screeps-server`](https://github.com/Jomik/screeps-server) with MongoDB and Redis, and can optionally start `steamless-client` for the browser client experience.
 
 Quick start:
 
 ```bash
 cp Server/screeps/config.example.yml Server/screeps/config.yml
-docker compose -f Server/docker-compose.yml up -d
+cp Server/.env.example Server/.env
+docker compose --env-file Server/.env -f Server/docker-compose.yml up -d
 ```
+
+Set `STEAM_KEY` in `Server/.env`, then edit `Server/screeps/config.yml` to enable any extra mods you want.
 
 Then deploy to your local server with:
 
@@ -54,7 +57,7 @@ Then deploy to your local server with:
 npm run push-pserver
 ```
 
-See `Server/README.md` for the full setup and CLI workflow.
+See `Server/README.md` for the full setup and server management workflow.
 That includes the optional `steamless-client` profile, which exposes the browser client at `http://127.0.0.1:8080`.
 
 ## Write Your Bot

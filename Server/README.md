@@ -1,41 +1,42 @@
 # Local Screeps Server
 
-This starter includes a Docker-based private server setup built around the `screepers/screeps-launcher` image.
+This starter includes a Docker-based private server setup built around [`Jomik/screeps-server`](https://github.com/Jomik/screeps-server).
 
 ## Requirements
 
 - Docker Desktop or Docker Engine with Compose
 - A Steam key for the Screeps private server
 
-## Apple Silicon
-
-The `screepers/screeps-launcher` image is currently published as `linux/amd64`, so Docker Desktop on Apple Silicon needs to run it under emulation.
-`Server/docker-compose.yml` already sets `platform: linux/amd64` for you.
-
 ## Files
 
-- `docker-compose.yml`: runs MongoDB, Redis, `screeps-launcher`, and an optional `steamless-client`
-- `screeps/config.example.yml`: starter launcher config
-- `screeps/config.yml`: your local config copy with secrets and local tweaks
+- `docker-compose.yml`: runs MongoDB, Redis, `Jomik/screeps-server`, and an optional `steamless-client`
+- `.env.example`: starter environment file for `STEAM_KEY` and optional proxy overrides
+- `screeps/config.example.yml`: starter server config
+- `screeps/config.yml`: your local config copy with mods and launcher options
 
 ## First Run
 
-Create your local launcher config:
+Create your local server config and env file:
 
 ```bash
 cp Server/screeps/config.example.yml Server/screeps/config.yml
+cp Server/.env.example Server/.env
 ```
 
-Edit `Server/screeps/config.yml` and set at least:
+Edit `Server/.env` and set:
 
-- `steamKey`
-- any mods you want enabled
-- any local bot packages you want mounted or installed
+- `STEAM_KEY`
+
+Then edit `Server/screeps/config.yml` and adjust:
+
+- enabled mods
+- any bots you want installed automatically
+- launcher options such as `autoUpdate` and `logConsole`
 
 Start the server from the repository root:
 
 ```bash
-docker compose -f Server/docker-compose.yml up -d
+docker compose --env-file Server/.env -f Server/docker-compose.yml up -d
 ```
 
 The Screeps web UI will be available at `http://127.0.0.1:21025`.
@@ -44,7 +45,7 @@ The Screeps web UI will be available at `http://127.0.0.1:21025`.
 
 If you want the newer browser-based Steam client proxy, this stack also includes an optional `steamless-client` service based on [`screepers/steamless-client`](https://github.com/screepers/steamless-client).
 
-Before starting it, make the real Screeps `package.nw` file available inside `Server/steamless-client/package.nw`, or point `SCREEPS_NW_DIR` at the directory that already contains `package.nw`. The checked-in example file is only a placeholder so the expected filename is obvious; it is not usable by the client. You can export `SCREEPS_NW_DIR` in your shell, or put it in a local `.env` file next to `Server/docker-compose.yml`.
+Before starting it, make the real Screeps `package.nw` file available inside `Server/steamless-client/package.nw`, or point `SCREEPS_NW_DIR` at the directory that already contains `package.nw`. The checked-in example file is only a placeholder so the expected filename is obvious; it is not usable by the client. You can export `SCREEPS_NW_DIR` in your shell, or add it to `Server/.env`.
 
 Example on macOS:
 
@@ -55,7 +56,7 @@ export SCREEPS_NW_DIR="$HOME/Library/Application Support/Steam/steamapps/common/
 Then start the browser client profile:
 
 ```bash
-docker compose -f Server/docker-compose.yml --profile browser up -d
+docker compose --env-file Server/.env -f Server/docker-compose.yml --profile browser up -d
 ```
 
 If `package.nw` is missing, the container now exits immediately with a clear error instead of failing later inside `steamless-client`.
@@ -70,32 +71,29 @@ If you need to access it from another machine, set:
 
 ## Server Management
 
-Open the launcher CLI:
+This setup no longer uses the old `screeps-launcher` CLI. Manage mods through `Server/screeps/config.yml`, then restart the service to apply config changes:
 
 ```bash
-docker compose -f Server/docker-compose.yml exec screeps screeps-launcher cli
+docker compose --env-file Server/.env -f Server/docker-compose.yml restart screeps
 ```
 
-Useful commands inside the CLI:
-
-```text
-system.resetAllData()
-system.pauseSimulation()
-system.resumeSimulation()
-```
-
-Useful launcher commands:
+Useful operational commands:
 
 ```bash
-docker compose -f Server/docker-compose.yml exec screeps screeps-launcher apply
-docker compose -f Server/docker-compose.yml exec screeps screeps-launcher backup
-docker compose -f Server/docker-compose.yml exec screeps screeps-launcher upgrade
+docker compose --env-file Server/.env -f Server/docker-compose.yml logs -f screeps
+docker compose --env-file Server/.env -f Server/docker-compose.yml ps
 ```
 
 Stop the stack:
 
 ```bash
-docker compose -f Server/docker-compose.yml down
+docker compose --env-file Server/.env -f Server/docker-compose.yml down
+```
+
+Remove all persisted private-server data and start over:
+
+```bash
+docker compose --env-file Server/.env -f Server/docker-compose.yml down -v
 ```
 
 ## Deploy Your Bot To The Local Server
